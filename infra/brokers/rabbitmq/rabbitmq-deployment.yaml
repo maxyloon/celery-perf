@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: celery-perf
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/part-of: celery-perf
+    bench/component: broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rabbitmq
+        app.kubernetes.io/part-of: celery-perf
+        bench/component: broker
+        bench/broker: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "bench"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "bench"
+          ports:
+            - containerPort: 5672
+              name: amqp
+            - containerPort: 15672
+              name: management
+            - containerPort: 15692
+              name: prometheus
+          volumeMounts:
+            - name: rabbitmq-plugins
+              mountPath: /etc/rabbitmq/enabled_plugins
+              subPath: enabled_plugins
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          readinessProbe:
+            exec:
+              command: ["rabbitmq-diagnostics", "-q", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: rabbitmq-plugins
+          configMap:
+            name: rabbitmq-plugins-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-plugins-config
+  namespace: celery-perf
+data:
+  enabled_plugins: "[rabbitmq_management, rabbitmq_prometheus]."

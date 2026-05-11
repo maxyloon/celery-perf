@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bench-worker
+  namespace: celery-perf
+  labels:
+    app.kubernetes.io/part-of: celery-perf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: bench-worker
+subjects:
+  - kind: ServiceAccount
+    name: bench-worker
+    namespace: celery-perf

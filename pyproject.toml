@@ -1,22 +1,45 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "celery-perf"
+name = "benchlib"
 version = "0.1.0"
-description = "Celery performance benchmarks"
+description = "Celery/Kombu benchmarking library and harness"
 readme = "README.rst"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { text = "BSD-3-Clause" }
 dependencies = [
     "celery>=5.5",
+    "kombu>=5.4",
+    "opentelemetry-sdk>=1.24",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.24",
+    "pandas>=2.2",
+    "pyarrow>=15.0",
+]
+
+[project.optional-dependencies]
+dagster = [
+    "dagster>=1.7",
+    "dagster-k8s>=0.23",
+    "papermill>=2.6",
+    "nbformat>=5.9",
+    "nbconvert>=7.16",
+    "ipykernel>=6.0",
+    "matplotlib>=3.8",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "mypy>=1.10",
     "nats-py>=2.9",
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["benchmarks*"]
+include = ["benchlib*", "benchmarks*", "dagster_bench*"]
 
 [project.scripts]
-celery-perf-nats = "benchmarks.nats.benchmark:main"
+celery-perf-smoke = "benchlib.producer:smoke_cli"
+celery-perf-run   = "benchlib.producer:run_cli"

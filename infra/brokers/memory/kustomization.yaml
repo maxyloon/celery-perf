@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: celery-perf
+
+resources:
+  - ../../base
+
+patches:
+  # Patch the ConfigMap to use in-process memory:// transport
+  - target:
+      kind: ConfigMap
+      name: bench-config
+    patch: |-
+      - op: replace
+        path: /data/CELERY_BROKER_URL
+        value: "memory://"
+      - op: replace
+        path: /data/CELERY_RESULT_BACKEND
+        value: "cache+memory://"
+
+namePrefix: memory-
+nameSuffix: ""
+
+commonLabels:
+  bench/broker: memory

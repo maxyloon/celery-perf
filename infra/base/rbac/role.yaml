@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bench-worker
+  namespace: celery-perf
+  labels:
+    app.kubernetes.io/part-of: celery-perf
+rules:
+  # Allow workers to read their own ConfigMap
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+  # Allow reading Secrets (for broker credentials)
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]

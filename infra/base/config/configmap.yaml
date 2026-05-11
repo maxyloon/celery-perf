@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bench-config
+  namespace: celery-perf
+  labels:
+    app.kubernetes.io/part-of: celery-perf
+data:
+  # Broker and backend — overridden by broker/backend overlays
+  CELERY_BROKER_URL: "memory://"
+  CELERY_RESULT_BACKEND: "cache+memory://"
+
+  # Worker tuning — overridden by pool overlays
+  CELERY_POOL: "prefork"
+  CELERY_CONCURRENCY: "4"
+  CELERY_WORKER_PREFETCH_MULTIPLIER: "4"
+
+  # Serialisation
+  CELERY_TASK_SERIALIZER: "json"
+  CELERY_RESULT_SERIALIZER: "json"
+
+  # Results storage — PVC mount path inside the container
+  BENCH_RESULTS_PATH: "/results"
+
+  # OTel — override in cluster overlays to point at the Collector sidecar
+  OTEL_EXPORTER_OTLP_ENDPOINT: ""
+  OTEL_SERVICE_NAME: "benchlib"
