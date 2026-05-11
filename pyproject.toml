@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "celery-perf"
+version = "0.1.0"
+description = "Celery performance benchmarks"
+readme = "README.rst"
+requires-python = ">=3.11"
+license = { text = "BSD-3-Clause" }
+dependencies = [
+    "celery>=5.5",
+    "nats-py>=2.9",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["benchmarks*"]
+
+[project.scripts]
+celery-perf-nats = "benchmarks.nats.benchmark:main"
